@@ -1,9 +1,0 @@
-/home/niv228/VIbeCode/project/src/main/java/com/example/lecturenav/model/Chunk.java
-/home/niv228/VIbeCode/project/src/main/java/com/example/lecturenav/service/EmbeddingService.java
-/home/niv228/VIbeCode/project/src/main/java/com/example/lecturenav/controller/LectureController.java
-/home/niv228/VIbeCode/project/src/main/java/com/example/lecturenav/LecturenavBackendApplication.java
-/home/niv228/VIbeCode/project/src/main/java/com/example/lecturenav/util/PdfUtil.java
-/home/niv228/VIbeCode/project/src/main/java/com/example/lecturenav/service/VectorUtil.java
-/home/niv228/VIbeCode/project/src/main/java/com/example/lecturenav/config/RestTemplateConfig.java
-/home/niv228/VIbeCode/project/src/main/java/com/example/lecturenav/model/Lecture.java
-/home/niv228/VIbeCode/project/src/main/java/com/example/lecturenav/service/LectureService.java

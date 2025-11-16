@@ -1,9 +1,0 @@
-com/example/lecturenav/model/Lecture.class
-com/example/lecturenav/service/LectureService.class
-com/example/lecturenav/util/VectorUtil.class
-com/example/lecturenav/config/RestTemplateConfig.class
-com/example/lecturenav/LecturenavBackendApplication.class
-com/example/lecturenav/model/Chunk.class
-com/example/lecturenav/service/EmbeddingService.class
-com/example/lecturenav/controller/LectureController.class
-com/example/lecturenav/util/PdfUtil.class
