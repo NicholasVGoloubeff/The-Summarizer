@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LectureNav App – Study with your PDFs</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        :root {
+            --bg: #0f172a;
+            --bg-elevated: #020617;
+            --card: #020617;
+            --card-border: #1e293b;
+            --accent: #38bdf8;
+            --accent-soft: rgba(56, 189, 248, 0.12);
+            --accent-hover: #0ea5e9;
+            --text: #e5e7eb;
+            --text-soft: #9ca3af;
+            --danger: #f97373;
+            --danger-soft: rgba(248, 113, 113, 0.12);
+            --radius-lg: 18px;
+            --radius-md: 10px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: radial-gradient(circle at top, #1f2937 0, #020617 45%, #000 100%);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        header {
+            padding: 12px 24px;
+            border-bottom: 1px solid #1e293b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(12px);
+            background: linear-gradient(to right, rgba(15,23,42,0.95), rgba(15,23,42,0.85));
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .nav-shell {
+            width: 100%;
+            max-width: 1120px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .app-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 999px;
+            background: radial-gradient(circle at 30% 20%, #38bdf8, #1d4ed8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 25px rgba(56,189,248,0.6);
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .app-title-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app-title-text h1 {
+            margin: 0;
+            font-size: 18px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .app-title-text span {
+            font-size: 11px;
+            color: var(--text-soft);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-link {
+            font-size: 13px;
+            color: var(--text-soft);
+            position: relative;
+            padding: 3px 0;
+        }
+
+        .nav-link.active::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -2px;
+            height: 2px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #38bdf8, #a855f7);
+        }
+
+        .btn {
+            border-radius: 999px;
+            border: 1px solid transparent;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            background: #111827;
+            color: var(--text);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.12s ease, transform 0.08s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+        }
+
+        .btn.small {
+            padding: 4px 10px;
+            font-size: 11px;
+        }
+
+        .btn.primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            color: #0b1020;
+            box-shadow: 0 0 18px rgba(56,189,248,0.7);
+        }
+
+        .btn.primary:hover {
+            background: linear-gradient(135deg, var(--accent-hover), #38bdf8);
+            transform: translateY(-1px);
+        }
+
+        .btn.secondary {
+            border-color: #1f2937;
+            background: #020617;
+        }
+
+        .btn.secondary:hover {
+            border-color: #4b5563;
+            background: #020817;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: default;
+            transform: none;
+            box-shadow: none;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .shell {
+            width: 100%;
+            max-width: 1120px;
+            display: grid;
+            grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.3fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .shell {
+                grid-template-columns: minmax(0, 1fr);
+            }
+        }
+
+        .panel {
+            background: radial-gradient(circle at top left, rgba(56,189,248,0.08), var(--card));
+            border: 1px solid var(--card-border);
+            border-radius: 22px;
+            padding: 18px 18px 20px;
+            box-shadow:
+                    0 26px 80px rgba(15,23,42,0.9),
+                    0 0 0 1px rgba(148,163,184,0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .panel h2 {
+            margin: 0 0 4px;
+            font-size: 16px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--text-soft);
+        }
+
+        .panel-subtitle {
+            font-size: 13px;
+            color: var(--text-soft);
+        }
+
+        .section {
+            padding: 10px 12px;
+            border-radius: var(--radius-lg);
+            background: rgba(15,23,42,0.94);
+            border: 1px solid #111827;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-soft);
+            text-transform: uppercase;
+            letter-spacing: 0.09em;
+        }
+
+        .upload-zone {
+            border-radius: var(--radius-md);
+            border: 1px dashed #374151;
+            padding: 14px;
+            background: radial-gradient(circle at top left, rgba(56,189,248,0.05), rgba(15,23,42,0.95));
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .upload-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .upload-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 999px;
+            border: 1px solid rgba(56,189,248,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            background: rgba(15,23,42,0.95);
+            box-shadow: 0 0 16px rgba(56,189,248,0.4);
+        }
+
+        .upload-text-main {
+            font-size: 14px;
+        }
+
+        label {
+            font-size: 13px;
+            color: var(--text-soft);
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            border-radius: 10px;
+            border: 1px solid #1f2933;
+            background: #020617;
+            padding: 8px 10px;
+            color: var(--text);
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            font-size: 13px;
+            color: var(--text-soft);
+        }
+
+        input[type="file"]::file-selector-button {
+            padding: 6px 12px;
+            margin-right: 8px;
+            border-radius: 999px;
+            border: 1px solid #1f2937;
+            background: #020617;
+            color: var(--text);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: background 0.12s ease, border-color 0.12s ease, transform 0.08s ease;
+        }
+
+        input[type="file"]::file-selector-button:hover {
+            background: #020817;
+            border-color: var(--accent);
+            transform: translateY(-0.5px);
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 1px rgba(56,189,248,0.4);
+            background: #020617;
+        }
+
+        textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        .row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .row > * {
+            flex: 1;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .status-bar {
+            margin-top: 6px;
+            font-size: 12px;
+            border-radius: 999px;
+            padding: 4px 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(15,23,42,0.9);
+            border: 1px solid #111827;
+            color: var(--text-soft);
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: #4b5563;
+        }
+
+        .status-bar.loading .status-dot {
+            background: var(--accent);
+            box-shadow: 0 0 8px rgba(56,189,248,0.8);
+        }
+
+        .status-bar.error {
+            background: var(--danger-soft);
+            border-color: rgba(248,113,113,0.7);
+            color: #fecaca;
+        }
+
+        .status-bar.error .status-dot {
+            background: var(--danger);
+            box-shadow: 0 0 8px rgba(248,113,113,0.8);
+        }
+
+        .status-bar.ok {
+            background: rgba(22,163,74,0.18);
+            border-color: rgba(22,163,74,0.6);
+            color: #bbf7d0;
+        }
+
+        .status-bar.ok .status-dot {
+            background: #4ade80;
+            box-shadow: 0 0 8px rgba(74,222,128,0.8);
+        }
+
+        .result-card {
+            border-radius: var(--radius-lg);
+            border: 1px solid #111827;
+            background: #020617;
+            padding: 12px;
+            min-height: 160px;
+            max-height: 420px;
+            overflow-y: auto;
+            font-size: 14px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 6px;
+        }
+
+        .result-header span {
+            font-size: 12px;
+            color: var(--text-soft);
+        }
+
+        .mode-tabs {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px;
+            border-radius: 999px;
+            background: #020617;
+            border: 1px solid #111827;
+        }
+
+        .mode-tab {
+            border-radius: 999px;
+            border: none;
+            background: transparent;
+            padding: 5px 10px;
+            font-size: 12px;
+            color: var(--text-soft);
+            cursor: pointer;
+        }
+
+        .mode-tab.active {
+            background: var(--accent-soft);
+            color: #e0f2fe;
+        }
+
+        .history-list {
+            max-height: 160px;
+            overflow-y: auto;
+            font-size: 12px;
+            color: var(--text-soft);
+        }
+
+        .history-item {
+            padding: 6px 8px;
+            border-radius: 10px;
+            border: 1px solid #111827;
+            background: #020617;
+            margin-bottom: 6px;
+            cursor: pointer;
+            transition: background 0.12s ease, border-color 0.12s ease, transform 0.08s ease;
+        }
+
+        .history-item:hover {
+            background: #02081a;
+            border-color: var(--accent);
+            transform: translateY(-1px);
+        }
+
+        .history-meta {
+            font-size: 11px;
+            color: var(--text-soft);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .history-type {
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            font-size: 10px;
+        }
+
+        .history-body {
+            margin-top: 4px;
+            color: #d1d5db;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .history-empty {
+            font-size: 12px;
+            color: var(--text-soft);
+            font-style: italic;
+        }
+
+        footer {
+            border-top: 1px solid #1e293b;
+            padding: 8px 20px 14px;
+            font-size: 11px;
+            color: var(--text-soft);
+            text-align: center;
+            background: rgba(2,6,23,0.96);
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="nav-shell">
+        <div class="app-title">
+            <div class="logo-circle">LN</div>
+            <div class="app-title-text">
+                <h1>LectureNav</h1>
+                <span>Live App • Upload a lecture to get started</span>
+            </div>
+        </div>
+        <nav class="nav-links">
+            <a href="index.html" class="nav-link">Home</a>
+            <span class="nav-link active">App</span>
+            <span class="nav-link">Powered by Cerebras</span>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <div class="shell">
+
+        <!-- LEFT PANEL: Upload & Lectures -->
+        <div class="panel">
+            <h2>Lectures</h2>
+            <div class="panel-subtitle">
+                Upload a PDF once, then reuse it for questions, summaries, and practice.
+            </div>
+
+            <div class="section">
+                <div class="section-title">Upload lecture</div>
+
+                <div class="upload-zone">
+                    <div class="upload-header">
+                        <div class="upload-icon">📄</div>
+                        <div>
+                            <div class="upload-text-main">Attach a PDF lecture or notes</div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div>
+                            <label for="pdfFile">PDF File</label><br>
+                            <input type="file" id="pdfFile" accept="application/pdf">
+                        </div>
+                        <div>
+                            <label for="lectureName">Lecture Name</label><br>
+                            <input type="text" id="lectureName" placeholder="Linear Algebra – Eigenvalues">
+                        </div>
+                    </div>
+
+                    <div class="btn-row" style="margin-top: 4px;">
+                        <button id="uploadBtn" class="btn primary">
+                            ⬆ Upload &amp; Index
+                        </button>
+                        <button id="refreshLecturesBtn" class="btn secondary">
+                            🔄 Refresh Lectures
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="lectureSelect">Select lecture</label><br>
+                    <select id="lectureSelect">
+                        <option value="">No lectures loaded yet</option>
+                    </select>
+                </div>
+
+                <div id="statusBar" class="status-bar">
+                    <div class="status-dot"></div>
+                    <span id="statusText">Idle</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL: Q&A / Summary / Practice -->
+        <div class="panel">
+            <h2>Study Assistant</h2>
+            <div class="panel-subtitle">
+                Ask targeted questions, generate summaries, and create practice questions from your lecture.
+            </div>
+
+            <div class="section">
+                <div class="row" style="align-items: center; justify-content: space-between;">
+                    <div class="section-title">Mode</div>
+                    <div class="mode-tabs">
+                        <button class="mode-tab active" data-mode="qa">Q&amp;A</button>
+                        <button class="mode-tab" data-mode="summary">Summary</button>
+                        <button class="mode-tab" data-mode="practice">Practice</button>
+                    </div>
+                </div>
+
+                <!-- Q&A Controls -->
+                <div id="qaControls">
+                    <label for="questionInput">Your question</label>
+                    <textarea id="questionInput" placeholder="Explain eigenvalues like I'm in my second year..."></textarea>
+                    <div class="btn-row">
+                        <button id="askBtn" class="btn primary">💬 Ask Question</button>
+                    </div>
+                </div>
+
+                <!-- Summary Controls -->
+                <div id="summaryControls" style="display:none;">
+                    <p style="font-size:13px;color:var(--text-soft);margin:4px 0 10px;">
+                        Get a concise, student-friendly summary of the selected lecture.
+                    </p>
+                    <div class="btn-row">
+                        <button id="summarizeBtn" class="btn primary">📝 Summarize Lecture</button>
+                    </div>
+                </div>
+
+                <!-- Practice Controls -->
+                <div id="practiceControls" style="display:none;">
+                    <div class="row">
+                        <div>
+                            <label for="numQuestionsInput">Number of questions</label>
+                            <input id="numQuestionsInput" type="number" min="1" max="20" value="5">
+                        </div>
+                    </div>
+                    <div class="btn-row" style="margin-top: 8px;">
+                        <button id="generateBtn" class="btn primary">🎯 Generate Practice</button>
+                    </div>
+                    <p style="font-size:12px;color:var(--text-soft);margin:4px 0 0;">
+                        Mix of conceptual and computational questions, with answers.
+                    </p>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="result-header">
+                    <div class="section-title">AI Response</div>
+                    <span id="resultMeta"></span>
+                </div>
+                <div id="result" class="result-card">
+                    The AI’s explanations, summaries, and practice questions will appear here.
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="row" style="align-items:center; justify-content: space-between;">
+                    <div class="section-title">History</div>
+                    <button id="clearHistoryBtn" class="btn secondary small">
+                        🗑 Clear
+                    </button>
+                </div>
+                <div id="historyList" class="history-list">
+                    <div class="history-empty">
+                        No history yet. Ask a question, summarize, or generate practice to see recent activity for this lecture.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<footer>
+    LectureNav · App view · Your data is stored in memory only for this session.
+</footer>
+
+<script>
+window.addEventListener('DOMContentLoaded', function () {
+    const API_BASE = '/api';
+
+    const pdfFileInput = document.getElementById('pdfFile');
+    const lectureNameInput = document.getElementById('lectureName');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const refreshLecturesBtn = document.getElementById('refreshLecturesBtn');
+    const lectureSelect = document.getElementById('lectureSelect');
+    const statusBar = document.getElementById('statusBar');
+    const statusText = document.getElementById('statusText');
+
+    const modeTabButtons = document.querySelectorAll('.mode-tab');
+    const qaControls = document.getElementById('qaControls');
+    const summaryControls = document.getElementById('summaryControls');
+    const practiceControls = document.getElementById('practiceControls');
+
+    const questionInput = document.getElementById('questionInput');
+    const askBtn = document.getElementById('askBtn');
+    const summarizeBtn = document.getElementById('summarizeBtn');
+    const generateBtn = document.getElementById('generateBtn');
+    const numQuestionsInput = document.getElementById('numQuestionsInput');
+
+    const resultDiv = document.getElementById('result');
+    const resultMeta = document.getElementById('resultMeta');
+    const historyList = document.getElementById('historyList');
+    const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+
+    let currentMode = 'qa';
+    const historyEntries = [];
+
+    function setStatus(mode, text) {
+        statusBar.classList.remove('loading', 'error', 'ok');
+        if (mode) statusBar.classList.add(mode);
+        statusText.textContent = text;
+    }
+
+    function setButtonsDisabled(disabled) {
+        uploadBtn.disabled = disabled;
+        refreshLecturesBtn.disabled = disabled;
+        if (askBtn) askBtn.disabled = disabled;
+        if (summarizeBtn) summarizeBtn.disabled = disabled;
+        if (generateBtn) generateBtn.disabled = disabled;
+    }
+
+    function showResult(text, meta) {
+        resultDiv.textContent = text || '(No content)';
+        resultMeta.textContent = meta || '';
+    }
+
+    function showError(msg) {
+        showResult('Error:\n' + msg, '');
+        setStatus('error', msg);
+    }
+
+    function formatMs(ms) {
+        const seconds = ms / 1000;
+        if (seconds < 1) {
+            return String(Math.round(ms)) + ' ms';
+        }
+        return seconds.toFixed(1) + ' s';
+    }
+
+    function pushHistory(entry) {
+        historyEntries.unshift({
+            lectureId: entry.lectureId,
+            type: entry.type,
+            preview: entry.preview,
+            fullText: entry.fullText,
+            meta: entry.meta || '',
+            timestamp: Date.now()
+        });
+        if (historyEntries.length > 30) {
+            historyEntries.pop();
+        }
+        renderHistory();
+    }
+
+    function renderHistory() {
+        const selectedId = lectureSelect.value;
+        historyList.innerHTML = '';
+
+        const filtered = historyEntries.filter(function (h) {
+            return String(h.lectureId) === String(selectedId);
+        });
+
+        if (!selectedId || filtered.length === 0) {
+            const div = document.createElement('div');
+            div.className = 'history-empty';
+            div.textContent = 'No history yet for this lecture.';
+            historyList.appendChild(div);
+            return;
+        }
+
+        filtered.slice(0, 12).forEach(function (entry) {
+            const item = document.createElement('div');
+            item.className = 'history-item';
+
+            const metaRow = document.createElement('div');
+            metaRow.className = 'history-meta';
+
+            const typeSpan = document.createElement('span');
+            typeSpan.className = 'history-type';
+            typeSpan.textContent = entry.type.toUpperCase();
+
+            const timeSpan = document.createElement('span');
+            const d = new Date(entry.timestamp);
+            timeSpan.textContent = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            metaRow.appendChild(typeSpan);
+            metaRow.appendChild(timeSpan);
+
+            const body = document.createElement('div');
+            body.className = 'history-body';
+            body.textContent = entry.preview;
+
+            item.appendChild(metaRow);
+            item.appendChild(body);
+
+            item.addEventListener('click', function () {
+                showResult(entry.fullText, entry.meta || '');
+            });
+
+            historyList.appendChild(item);
+        });
+    }
+
+    function clearHistoryForSelectedLecture() {
+        const selectedId = lectureSelect.value;
+        if (!selectedId) {
+            historyEntries.length = 0;
+        } else {
+            for (let i = historyEntries.length - 1; i >= 0; i--) {
+                if (String(historyEntries[i].lectureId) === String(selectedId)) {
+                    historyEntries.splice(i, 1);
+                }
+            }
+        }
+        renderHistory();
+    }
+
+    async function uploadLecture() {
+        const file = pdfFileInput.files[0];
+        const name = lectureNameInput.value.trim();
+
+        if (!file) {
+            showError('Please choose a PDF file first.');
+            return;
+        }
+        if (!name) {
+            showError('Please give this lecture a name.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('name', name);
+
+        try {
+            setStatus('loading', 'Uploading and indexing lecture…');
+            setButtonsDisabled(true);
+
+            const response = await fetch(API_BASE + '/lectures', {
+                method: 'POST',
+                body: formData
+            });
+
+            const text = await response.text();
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                throw new Error('Unexpected response: ' + text);
+            }
+
+            if (!response.ok) {
+                throw new Error(data.error || JSON.stringify(data));
+            }
+
+            setStatus('ok', 'Uploaded successfully! Lecture ID: ' + data.lectureId);
+            showResult(
+                '✅ Lecture uploaded.\n\nID: ' + data.lectureId + '\nName: ' + data.name,
+                'Upload complete'
+            );
+
+            await loadLectures();
+        } catch (err) {
+            console.error(err);
+            showError(err.message || 'Upload failed');
+        } finally {
+            setButtonsDisabled(false);
+        }
+    }
+
+    async function loadLectures() {
+        try {
+            setStatus('loading', 'Loading lectures…');
+            const res = await fetch(API_BASE + '/lectures');
+            const data = await res.json();
+
+            lectureSelect.innerHTML = '';
+
+            if (!Array.isArray(data) || data.length === 0) {
+                const opt = document.createElement('option');
+                opt.value = '';
+                opt.textContent = 'No lectures available yet';
+                lectureSelect.appendChild(opt);
+                setStatus('', 'No lectures yet – upload one to get started.');
+                renderHistory();
+                return;
+            }
+
+            data.forEach(function (lec) {
+                const opt = document.createElement('option');
+                opt.value = lec.id;
+                opt.textContent = lec.name + ' (ID ' + lec.id + ')';
+                lectureSelect.appendChild(opt);
+            });
+
+            setStatus('ok', 'Loaded ' + data.length + ' lecture(s).');
+            renderHistory();
+        } catch (err) {
+            console.error(err);
+            showError('Failed to load lectures: ' + err.message);
+        }
+    }
+
+    function getSelectedLectureIdOrError() {
+        const val = lectureSelect.value;
+        if (!val) {
+            showError('Please select a lecture first.');
+            return null;
+        }
+        return Number(val);
+    }
+
+    async function askQuestion() {
+        const lectureId = getSelectedLectureIdOrError();
+        if (lectureId === null) return;
+
+        const question = questionInput.value.trim();
+        if (!question) {
+            showError('Please type a question.');
+            return;
+        }
+
+        const started = performance.now();
+
+        try {
+            setButtonsDisabled(true);
+            setStatus('loading', 'Asking Cerebras…');
+
+            const res = await fetch(API_BASE + '/ask', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ lectureId: lectureId, question: question })
+            });
+
+            const text = await res.text();
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                throw new Error('Unexpected response: ' + text);
+            }
+
+            if (!res.ok) {
+                throw new Error(data.error || JSON.stringify(data));
+            }
+
+            const elapsed = performance.now() - started;
+            const meta = 'Q&A • Lecture ' + lectureId + ' • ⏱ ' + formatMs(elapsed);
+            const fullText = 'Q: ' + question + '\n\nA:\n' + data.answer;
+
+            showResult(fullText, meta);
+            setStatus('ok', 'Answer received.');
+
+            pushHistory({
+                lectureId: lectureId,
+                type: 'qa',
+                preview: 'Q: ' + question + '  |  A: ' + String(data.answer).slice(0, 80) + '…',
+                fullText: fullText,
+                meta: meta
+            });
+        } catch (err) {
+            console.error(err);
+            showError(err.message || 'Ask failed');
+        } finally {
+            setButtonsDisabled(false);
+        }
+    }
+
+    async function summarizeLecture() {
+        const lectureId = getSelectedLectureIdOrError();
+        if (lectureId === null) return;
+
+        const started = performance.now();
+
+        try {
+            setButtonsDisabled(true);
+            setStatus('loading', 'Summarizing lecture…');
+
+            const res = await fetch(API_BASE + '/summarize', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ lectureId: lectureId })
+            });
+
+            const text = await res.text();
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                throw new Error('Unexpected response: ' + text);
+            }
+
+            if (!res.ok) {
+                throw new Error(data.error || JSON.stringify(data));
+            }
+
+            const elapsed = performance.now() - started;
+            const meta = 'Summary • Lecture ' + lectureId + ' • ⏱ ' + formatMs(elapsed);
+            const fullText = data.summary;
+
+            showResult(fullText, meta);
+            setStatus('ok', 'Summary ready.');
+
+            pushHistory({
+                lectureId: lectureId,
+                type: 'summary',
+                preview: String(data.summary).slice(0, 100) + '…',
+                fullText: fullText,
+                meta: meta
+            });
+        } catch (err) {
+            console.error(err);
+            showError(err.message || 'Summary failed');
+        } finally {
+            setButtonsDisabled(false);
+        }
+    }
+
+    async function generateQuestions() {
+        const lectureId = getSelectedLectureIdOrError();
+        if (lectureId === null) return;
+
+        const num = Number(numQuestionsInput.value) || 5;
+        const started = performance.now();
+
+        try {
+            setButtonsDisabled(true);
+            setStatus('loading', 'Generating practice questions…');
+
+            const res = await fetch(API_BASE + '/generate-questions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ lectureId: lectureId, numQuestions: num })
+            });
+
+            const text = await res.text();
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                throw new Error('Unexpected response: ' + text);
+            }
+
+            if (!res.ok) {
+                throw new Error(data.error || JSON.stringify(data));
+            }
+
+            const elapsed = performance.now() - started;
+            const meta = 'Practice • ' + num + ' question(s) • Lecture ' + lectureId + ' • ⏱ ' + formatMs(elapsed);
+            const fullText = data.questions;
+
+            showResult(fullText, meta);
+            setStatus('ok', 'Practice questions ready.');
+
+            pushHistory({
+                lectureId: lectureId,
+                type: 'practice',
+                preview: String(data.questions).split('\n').slice(0, 2).join(' ') + '…',
+                fullText: fullText,
+                meta: meta
+            });
+        } catch (err) {
+            console.error(err);
+            showError(err.message || 'Generation failed');
+        } finally {
+            setButtonsDisabled(false);
+        }
+    }
+
+    function setMode(mode) {
+        currentMode = mode;
+        modeTabButtons.forEach(function (btn) {
+            const m = btn.getAttribute('data-mode');
+            btn.classList.toggle('active', m === mode);
+        });
+
+        qaControls.style.display = mode === 'qa' ? 'block' : 'none';
+        summaryControls.style.display = mode === 'summary' ? 'block' : 'none';
+        practiceControls.style.display = mode === 'practice' ? 'block' : 'none';
+    }
+
+    uploadBtn.addEventListener('click', uploadLecture);
+    refreshLecturesBtn.addEventListener('click', loadLectures);
+
+    if (askBtn) askBtn.addEventListener('click', askQuestion);
+    if (summarizeBtn) summarizeBtn.addEventListener('click', summarizeLecture);
+    if (generateBtn) generateBtn.addEventListener('click', generateQuestions);
+
+    modeTabButtons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const mode = btn.getAttribute('data-mode');
+            setMode(mode);
+        });
+    });
+
+    lectureSelect.addEventListener('change', renderHistory);
+    clearHistoryBtn.addEventListener('click', clearHistoryForSelectedLecture);
+
+    loadLectures();
+});
+</script>
+</body>
+</html>

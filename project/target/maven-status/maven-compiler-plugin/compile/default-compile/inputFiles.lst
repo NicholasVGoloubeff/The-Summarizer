@@ -1,0 +1,10 @@
+/home/ignvg/The-Summarizer/project/src/main/java/com/example/lecturenav/util/PdfUtil.java
+/home/ignvg/The-Summarizer/project/src/main/java/com/example/lecturenav/service/LectureService.java
+/home/ignvg/The-Summarizer/project/src/main/java/com/example/lecturenav/service/VectorUtil.java
+/home/ignvg/The-Summarizer/project/src/main/java/com/example/lecturenav/controller/GlobalExceptionHandler.java
+/home/ignvg/The-Summarizer/project/src/main/java/com/example/lecturenav/controller/LectureController.java
+/home/ignvg/The-Summarizer/project/src/main/java/com/example/lecturenav/model/Chunk.java
+/home/ignvg/The-Summarizer/project/src/main/java/com/example/lecturenav/config/RestTemplateConfig.java
+/home/ignvg/The-Summarizer/project/src/main/java/com/example/lecturenav/LecturenavBackendApplication.java
+/home/ignvg/The-Summarizer/project/src/main/java/com/example/lecturenav/model/Lecture.java
+/home/ignvg/The-Summarizer/project/src/main/java/com/example/lecturenav/service/EmbeddingService.java
